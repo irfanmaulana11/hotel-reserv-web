@@ -18,7 +18,7 @@
                     <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="s-city">Destinasi</label>
                     <select name="city" id="s-city" class="mt-2 w-full rounded-2xl border border-stone-200 bg-white px-3 py-2.5 text-sm text-stone-900 outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
                         <option value="">Semua kota</option>
-                        @foreach (collect(config('hotel.hotels'))->pluck('city')->unique()->sort() as $c)
+                        @foreach (\App\Models\Hotel::where('is_active', true)->distinct()->pluck('city')->sort() as $c)
                             <option value="{{ $c }}" @selected($city === $c)>{{ $c }}</option>
                         @endforeach
                     </select>
@@ -90,21 +90,47 @@
                     </div>
                     <div class="flex flex-1 flex-col justify-between p-6">
                         <div>
-                            <p class="text-xs font-semibold uppercase tracking-wide text-stone-500">{{ $hotel['brand'] }}</p>
-                            <h2 class="mt-1 font-serif text-xl font-semibold text-stone-900">{{ $hotel['name'] }}</h2>
-                            <p class="mt-1 text-sm text-stone-600">{{ $hotel['city'] }} · Skor {{ number_format($hotel['rating'], 1) }}/5</p>
-                            <p class="mt-3 line-clamp-2 text-sm leading-relaxed text-stone-600">{{ $hotel['description'] }}</p>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-stone-500">
+                                {{ $hotel['brand'] }}
+                            </p>
+
+                            <h2 class="mt-1 font-serif text-2xl font-semibold text-stone-900">
+                                {{ $hotel['name'] }}
+                            </h2>
+
+                            <div class="mt-1 flex items-center gap-1.5 text-sm text-stone-600">
+                                <svg class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                </svg>
+
+                                <span>
+                                    {{ $hotel['city'] }}
+                                    <span class="mx-1 text-stone-400">·</span>
+                                    <span style="color: #fbce00;">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            @if ($i <= round($hotel['rating']))
+                                                ★
+                                            @endif
+                                        @endfor
+                                    </span>
+                                </span>
+                            </div>
+
+                            <p class="mt-3 line-clamp-2 text-sm leading-relaxed text-stone-600">
+                                {{ $hotel['description'] }}
+                            </p>
                         </div>
                         <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
-                                <p class="text-sm text-stone-600">
+                                <p class="text-xl text-stone-600">
                                     Mulai dari <span class="font-semibold text-stone-900">{{ $fmt($minPrice) }}</span>
                                     <span class="text-stone-400">/ malam</span>
                                 </p>
                                 @if ($fullyBooked)
-                                    <p class="mt-0.5 text-xs font-medium text-stone-400">Tidak ada kamar tersisa</p>
+                                    <p class="mt-0.5 text-xs font-medium text-stone-400" style="color: #8a1e29;">Tidak ada kamar tersisa</p>
                                 @else
-                                    <p class="mt-0.5 text-xs text-stone-500">{{ $totalAvail }} kamar tersisa</p>
+                                    <p class="mt-0.5 text-xs text-stone-500" style="color: #8a1e29;">{{ $totalAvail }} kamar tersisa</p>
                                 @endif
                             </div>
                             @if ($fullyBooked)

@@ -1,0 +1,173 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Hotel;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class HotelSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $hotels = [
+            [
+                'name' => 'Grand Luxury Hotel Jakarta',
+                'address' => 'Jl. Sudirman No. 123',
+                'city' => 'Jakarta',
+                'country' => 'Indonesia',
+                'phone' => '+62-21-12345678',
+                'email' => 'info@grandluxury.com',
+                'star_rating' => 5,
+                'description' => 'Hotel bintang 5 dengan fasilitas lengkap di pusat kota Jakarta. Menawarkan pemandangan kota yang menakjubkan dan layanan premium.',
+                'price_per_night' => 1500000,
+                'total_rooms' => 200,
+                'available_rooms' => 150,
+                'image_url' => 'https://via.placeholder.com/800x600?text=Grand+Luxury+Hotel',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Bali Beach Resort',
+                'address' => 'Jl. Pantai Kuta No. 88',
+                'city' => 'Bali',
+                'country' => 'Indonesia',
+                'phone' => '+62-361-987654',
+                'email' => 'reservation@balibeach.com',
+                'star_rating' => 5,
+                'description' => 'Resort tepi pantai dengan pemandangan laut yang indah. Fasilitas spa, kolam renang infinity, dan restoran fine dining.',
+                'price_per_night' => 2000000,
+                'total_rooms' => 150,
+                'available_rooms' => 100,
+                'image_url' => 'https://via.placeholder.com/800x600?text=Bali+Beach+Resort',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Bandung Mountain Hotel',
+                'address' => 'Jl. Dago Pakar No. 45',
+                'city' => 'Bandung',
+                'country' => 'Indonesia',
+                'phone' => '+62-22-555666',
+                'email' => 'contact@bandungmountain.com',
+                'star_rating' => 4,
+                'description' => 'Hotel di kawasan pegunungan dengan udara sejuk dan pemandangan alam yang asri. Cocok untuk liburan keluarga.',
+                'price_per_night' => 800000,
+                'total_rooms' => 100,
+                'available_rooms' => 75,
+                'image_url' => 'https://via.placeholder.com/800x600?text=Bandung+Mountain+Hotel',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Surabaya Business Hotel',
+                'address' => 'Jl. HR Muhammad No. 234',
+                'city' => 'Surabaya',
+                'country' => 'Indonesia',
+                'phone' => '+62-31-777888',
+                'email' => 'info@surabayabusiness.com',
+                'star_rating' => 4,
+                'description' => 'Hotel bisnis modern dengan fasilitas meeting room dan business center. Lokasi strategis dekat pusat bisnis.',
+                'price_per_night' => 900000,
+                'total_rooms' => 120,
+                'available_rooms' => 90,
+                'image_url' => 'https://via.placeholder.com/800x600?text=Surabaya+Business+Hotel',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Yogyakarta Heritage Inn',
+                'address' => 'Jl. Malioboro No. 56',
+                'city' => 'Yogyakarta',
+                'country' => 'Indonesia',
+                'phone' => '+62-274-333444',
+                'email' => 'booking@yogyaheritage.com',
+                'star_rating' => 3,
+                'description' => 'Hotel dengan nuansa tradisional Jawa di jantung kota Yogyakarta. Dekat dengan Malioboro dan Keraton.',
+                'price_per_night' => 500000,
+                'total_rooms' => 80,
+                'available_rooms' => 60,
+                'image_url' => 'https://via.placeholder.com/800x600?text=Yogyakarta+Heritage+Inn',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Lombok Paradise Hotel',
+                'address' => 'Jl. Senggigi Beach No. 12',
+                'city' => 'Lombok',
+                'country' => 'Indonesia',
+                'phone' => '+62-370-111222',
+                'email' => 'info@lombokparadise.com',
+                'star_rating' => 4,
+                'description' => 'Hotel tepi pantai dengan akses langsung ke Pantai Senggigi. Menawarkan aktivitas snorkeling dan diving.',
+                'price_per_night' => 1200000,
+                'total_rooms' => 90,
+                'available_rooms' => 70,
+                'image_url' => 'https://via.placeholder.com/800x600?text=Lombok+Paradise+Hotel',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Medan City Center Hotel',
+                'address' => 'Jl. Imam Bonjol No. 78',
+                'city' => 'Medan',
+                'country' => 'Indonesia',
+                'phone' => '+62-61-444555',
+                'email' => 'reservation@medancity.com',
+                'star_rating' => 3,
+                'description' => 'Hotel budget di pusat kota Medan dengan fasilitas memadai dan harga terjangkau.',
+                'price_per_night' => 450000,
+                'total_rooms' => 70,
+                'available_rooms' => 50,
+                'image_url' => 'https://via.placeholder.com/800x600?text=Medan+City+Center+Hotel',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Makassar Waterfront Hotel',
+                'address' => 'Jl. Penghibur No. 90',
+                'city' => 'Makassar',
+                'country' => 'Indonesia',
+                'phone' => '+62-411-666777',
+                'email' => 'contact@makassarwaterfront.com',
+                'star_rating' => 4,
+                'description' => 'Hotel modern dengan pemandangan laut Makassar. Fasilitas rooftop bar dan restaurant.',
+                'price_per_night' => 950000,
+                'total_rooms' => 110,
+                'available_rooms' => 85,
+                'image_url' => 'https://via.placeholder.com/800x600?text=Makassar+Waterfront+Hotel',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Semarang Colonial Hotel',
+                'address' => 'Jl. Pemuda No. 123',
+                'city' => 'Semarang',
+                'country' => 'Indonesia',
+                'phone' => '+62-24-888999',
+                'email' => 'info@semarangcolonial.com',
+                'star_rating' => 3,
+                'description' => 'Hotel dengan arsitektur kolonial yang unik. Lokasi strategis dekat Lawang Sewu dan Sam Poo Kong.',
+                'price_per_night' => 600000,
+                'total_rooms' => 60,
+                'available_rooms' => 45,
+                'image_url' => 'https://via.placeholder.com/800x600?text=Semarang+Colonial+Hotel',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Malang Highland Resort',
+                'address' => 'Jl. Raya Batu No. 67',
+                'city' => 'Malang',
+                'country' => 'Indonesia',
+                'phone' => '+62-341-222333',
+                'email' => 'booking@malanghighland.com',
+                'star_rating' => 4,
+                'description' => 'Resort di kawasan pegunungan Batu dengan udara sejuk dan pemandangan indah. Cocok untuk family gathering.',
+                'price_per_night' => 750000,
+                'total_rooms' => 85,
+                'available_rooms' => 65,
+                'image_url' => 'https://via.placeholder.com/800x600?text=Malang+Highland+Resort',
+                'is_active' => true,
+            ],
+        ];
+
+        foreach ($hotels as $hotel) {
+            Hotel::create($hotel);
+        }
+    }
+}

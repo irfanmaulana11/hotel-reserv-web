@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Destination;
+use App\Models\Hotel;
+use App\Models\Reservation;
+use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,16 +17,28 @@ class BookingController extends Controller
 {
     public function index(): View
     {
-        $cities = collect(config('hotel.hotels'))
+        $cities = Hotel::where('is_active', true)
+            ->distinct()
             ->pluck('city')
-            ->unique()
             ->sort()
             ->values()
             ->all();
 
+        $destinations = Destination::where('is_active', true)
+            ->orderBy('is_popular', 'desc')
+            ->orderBy('name')
+            ->get()
+            ->map(fn ($dest) => [
+                'city' => $dest->city,
+                'hotels' => Hotel::where('city', $dest->city)->where('is_active', true)->count(),
+                'rooms' => Hotel::where('city', $dest->city)->where('is_active', true)->sum('total_rooms'),
+                'image' => $dest->image_url,
+            ])
+            ->all();
+
         return view('booking.index', [
             'cities' => $cities,
-            'destinations' => config('hotel.destinations'),
+            'destinations' => $destinations,
         ]);
     }
 
@@ -49,10 +65,26 @@ class BookingController extends Controller
         $children = (int) ($validated['children'] ?? 0);
         $rooms = (int) ($validated['rooms'] ?? 1);
 
-        $hotels = $this->filterHotels(
-            collect(config('hotel.hotels')),
-            $validated['city'] ?? null,
-        );
+        $hotels = Hotel::where('is_active', true)
+            ->with('rooms')
+            ->when($validated['city'] ?? null, fn ($q, $city) => $q->where('city', $city))
+            ->get()
+            ->map(fn ($hotel) => [
+                'slug' => $hotel->id,
+                'name' => $hotel->name,
+                'city' => $hotel->city,
+                'brand' => 'Hotel',
+                'rating' => $hotel->star_rating,
+                'description' => $hotel->description,
+                'image' => $hotel->image_url,
+                'rooms' => $hotel->rooms->where('is_active', true)->map(fn ($room) => [
+                    'type' => $room->type,
+                    'price' => $room->price,
+                    'max_guests' => $room->max_guests,
+                    'available_rooms' => $room->available_rooms,
+                    'image' => $room->image_url,
+                ])->values()->all(),
+            ]);
 
         return view('booking.search', [
             'hotels' => $hotels,
@@ -66,11 +98,9 @@ class BookingController extends Controller
         ]);
     }
 
-    public function show(string $slug, Request $request): View|RedirectResponse
+    public function show(string $id, Request $request): View|RedirectResponse
     {
-        $hotel = collect(config('hotel.hotels'))->firstWhere('slug', $slug);
-
-        abort_unless($hotel, 404);
+        $hotel = Hotel::where('is_active', true)->findOrFail($id);
 
         $checkInRaw = $request->query('check_in', old('check_in'));
         $checkOutRaw = $request->query('check_out', old('check_out'));
@@ -81,8 +111,26 @@ class BookingController extends Controller
         $stayFilled = filled($checkInRaw) && filled($checkOutRaw) && filled($adultsRaw) && filled($roomsRaw);
 
         if (! $stayFilled) {
+            $hotelData = [
+                'slug' => $hotel->id,
+                'name' => $hotel->name,
+                'city' => $hotel->city,
+                'brand' => 'Hotel',
+                'rating' => $hotel->star_rating,
+                'description' => $hotel->description,
+                'image' => $hotel->image_url,
+                'rooms' => $hotel->rooms()->where('is_active', true)->get()->map(fn ($room) => [
+                    'type' => $room->type,
+                    'price' => $room->price,
+                    'max_guests' => $room->max_guests,
+                    'available_rooms' => $room->available_rooms,
+                    'image' => $room->image_url,
+                    'facilities' => $room->facilities ?? [],
+                ])->all(),
+            ];
+
             return view('booking.show', [
-                'hotel' => $hotel,
+                'hotel' => $hotelData,
                 'staySelected' => false,
                 'check_in' => null,
                 'check_out' => null,
@@ -112,7 +160,7 @@ class BookingController extends Controller
 
         if ($validator->fails()) {
             return redirect()
-                ->route('book.hotel', ['slug' => $slug])
+                ->route('book.hotel', ['slug' => $id])
                 ->withInput([
                     'check_in' => $checkInRaw,
                     'check_out' => $checkOutRaw,
@@ -131,8 +179,26 @@ class BookingController extends Controller
         $children = (int) ($data['children'] ?? 0);
         $rooms = (int) $data['rooms'];
 
+        $hotelData = [
+            'slug' => $hotel->id,
+            'name' => $hotel->name,
+            'city' => $hotel->city,
+            'brand' => 'Hotel',
+            'rating' => $hotel->star_rating,
+            'description' => $hotel->description,
+            'image' => $hotel->image_url,
+            'rooms' => $hotel->rooms()->where('is_active', true)->get()->map(fn ($room) => [
+                'type' => $room->type,
+                'price' => $room->price,
+                'max_guests' => $room->max_guests,
+                'available_rooms' => $room->available_rooms,
+                'image' => $room->image_url,
+                'facilities' => $room->facilities ?? [],
+            ])->all(),
+        ];
+
         return view('booking.show', [
-            'hotel' => $hotel,
+            'hotel' => $hotelData,
             'staySelected' => true,
             'check_in' => $checkIn->toDateString(),
             'check_out' => $checkOut->toDateString(),
@@ -146,7 +212,7 @@ class BookingController extends Controller
     public function checkout(Request $request): View
     {
         $data = $request->validate([
-            'hotel' => ['required', 'string'],
+            'hotel' => ['required', 'integer'],
             'room_type' => ['required', 'string', 'max:120'],
             'check_in' => ['required', 'date'],
             'check_out' => ['required', 'date', 'after:check_in'],
@@ -155,23 +221,31 @@ class BookingController extends Controller
             'rooms' => ['required', 'integer', 'min:1', 'max:10'],
         ]);
 
-        $hotel = collect(config('hotel.hotels'))->firstWhere('slug', $data['hotel']);
-        abort_unless($hotel, 404);
-
-        $room = collect($hotel['rooms'])->firstWhere('type', $data['room_type']);
-        abort_unless($room, 404);
+        $hotel = Hotel::where('is_active', true)->findOrFail($data['hotel']);
+        $room = $hotel->rooms()->where('type', $data['room_type'])->where('is_active', true)->firstOrFail();
 
         $checkIn = Carbon::parse($data['check_in']);
         $checkOut = Carbon::parse($data['check_out']);
         $nights = max(1, $checkIn->diffInDays($checkOut));
         $rooms = (int) $data['rooms'];
-        $subtotal = $room['price'] * $nights * $rooms;
+        $subtotal = $room->price * $nights * $rooms;
         $tax = (int) round($subtotal * 0.11);
         $total = $subtotal + $tax;
 
+        $hotelData = [
+            'slug' => $hotel->id,
+            'name' => $hotel->name,
+            'city' => $hotel->city,
+        ];
+
+        $roomData = [
+            'type' => $room->type,
+            'price' => $room->price,
+        ];
+
         return view('booking.checkout', [
-            'hotel' => $hotel,
-            'room' => $room,
+            'hotel' => $hotelData,
+            'room' => $roomData,
             'check_in' => $checkIn->toDateString(),
             'check_out' => $checkOut->toDateString(),
             'adults' => (int) $data['adults'],
@@ -187,7 +261,7 @@ class BookingController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'hotel' => ['required', 'string'],
+            'hotel' => ['required', 'integer'],
             'room_type' => ['required', 'string', 'max:120'],
             'check_in' => ['required', 'date'],
             'check_out' => ['required', 'date', 'after:check_in'],
@@ -200,28 +274,46 @@ class BookingController extends Controller
             'requests' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        $hotel = collect(config('hotel.hotels'))->firstWhere('slug', $validated['hotel']);
-        abort_unless($hotel, 404);
-
-        $room = collect($hotel['rooms'])->firstWhere('type', $validated['room_type']);
-        abort_unless($room, 404);
+        $hotel = Hotel::where('is_active', true)->findOrFail($validated['hotel']);
+        $room = $hotel->rooms()->where('type', $validated['room_type'])->where('is_active', true)->firstOrFail();
 
         $checkIn = Carbon::parse($validated['check_in']);
         $checkOut = Carbon::parse($validated['check_out']);
         $nights = max(1, $checkIn->diffInDays($checkOut));
         $rooms = (int) $validated['rooms'];
-        $subtotal = $room['price'] * $nights * $rooms;
+        $subtotal = $room->price * $nights * $rooms;
         $tax = (int) round($subtotal * 0.11);
         $total = $subtotal + $tax;
 
-        $reference = 'ABC-'.strtoupper(bin2hex(random_bytes(3)));
+        $reference = 'HRW-'.strtoupper(bin2hex(random_bytes(4)));
+
+        $reservation = Reservation::create([
+            'reference' => $reference,
+            'hotel_id' => $hotel->id,
+            'room_id' => $room->id,
+            //'user_id' => auth()->id() ?? null,
+            'guest_name' => $validated['guest_name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'check_in' => $checkIn,
+            'check_out' => $checkOut,
+            'adults' => (int) $validated['adults'],
+            'children' => (int) ($validated['children'] ?? 0),
+            'rooms' => $rooms,
+            'nights' => $nights,
+            'subtotal' => $subtotal,
+            'tax' => $tax,
+            'total' => $total,
+            'requests' => $validated['requests'] ?? null,
+            'status' => 'pending',
+        ]);
 
         return redirect()
             ->route('book.confirmation')
             ->with('booking', [
                 'reference' => $reference,
-                'hotel_name' => $hotel['name'],
-                'room_type' => $room['type'],
+                'hotel_name' => $hotel->name,
+                'room_type' => $room->type,
                 'check_in' => $checkIn->toDateString(),
                 'check_out' => $checkOut->toDateString(),
                 'adults' => (int) $validated['adults'],
@@ -244,12 +336,5 @@ class BookingController extends Controller
         return view('booking.confirmation', [
             'booking' => session('booking'),
         ]);
-    }
-
-    private function filterHotels(Collection $hotels, ?string $city): Collection
-    {
-        return $hotels
-            ->when($city, fn (Collection $c) => $c->where('city', $city))
-            ->values();
     }
 }

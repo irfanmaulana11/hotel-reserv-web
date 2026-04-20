@@ -2,24 +2,42 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Destination;
+use App\Models\Hotel;
 use Illuminate\View\View;
 
 class LandingController extends Controller
 {
     public function __invoke(): View
     {
-        $stayShowcase = collect(config('hotel.hotels'))
-            ->map(fn (array $hotel) => [
-                'label' => $hotel['showcase_label'] ?? strtoupper($hotel['city']).', INDONESIA',
-                'title' => $hotel['name'],
-                'image' => $hotel['image'],
-                'slug' => $hotel['slug'],
+        $destinations = Destination::where('is_active', true)
+            ->orderBy('is_popular', 'desc')
+            ->orderBy('name')
+            ->get()
+            ->map(fn ($dest) => [
+                'city' => $dest->city,
+                'hotels' => Hotel::where('city', $dest->city)->where('is_active', true)->count(),
+                'rooms' => Hotel::where('city', $dest->city)->where('is_active', true)->sum('total_rooms'),
+                'image' => $dest->image_url,
             ])
-            ->values()
+            ->take(6)
+            ->all();
+
+        $stayShowcase = Hotel::where('is_active', true)
+            ->orderBy('star_rating', 'desc')
+            ->limit(6)
+            ->get()
+            ->map(fn ($hotel) => [
+                'label' => strtoupper($hotel->city).', '.$hotel->country,
+                'title' => $hotel->name,
+                'image' => $hotel->image_url,
+                'slug' => $hotel->id,
+                'rating' => $hotel->star_rating,
+            ])
             ->all();
 
         return view('landing.index', [
-            'destinations' => config('hotel.destinations'),
+            'destinations' => $destinations,
             'stayShowcase' => $stayShowcase,
         ]);
     }
