@@ -311,6 +311,7 @@ class BookingController extends Controller
         return redirect()
             ->route('book.confirmation')
             ->with('booking', [
+                'reservation_id' => $reservation->id,
                 'reference' => $reference,
                 'hotel_name' => $hotel->name,
                 'room_type' => $room->type,

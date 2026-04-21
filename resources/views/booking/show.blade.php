@@ -59,7 +59,7 @@
             </div>
         </div>
 
-        <section class="mt-8 rounded-3xl border border-stone-200 bg-white p-6 shadow-md sm:p-8" aria-labelledby="stay-form-heading">
+        <section class="mt-8 rounded-3xl border border-stone-200 bg-[#f7f5d5] p-6 shadow-md sm:p-8" aria-labelledby="stay-form-heading">
             <h2 id="stay-form-heading" class="font-serif text-xl font-semibold text-stone-900 sm:text-2xl">
                 @if ($staySelected)
                     Periode menginap Anda

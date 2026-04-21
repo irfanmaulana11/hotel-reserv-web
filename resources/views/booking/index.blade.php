@@ -11,7 +11,7 @@
             </p>
         </div>
 
-        <div class="mt-10 rounded-3xl border border-stone-200 bg-white p-6 shadow-md sm:p-8">
+        <div class="mt-10 rounded-3xl border border-stone-200 bg-[#f7f5d5] p-6 shadow-md sm:p-8">
             <form action="{{ route('book.search') }}" method="get" class="grid gap-5 md:grid-cols-2 lg:grid-cols-5 lg:items-end">
                 <div class="md:col-span-2 lg:col-span-1">
                     <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="city">Destinasi</label>
