@@ -45,8 +45,8 @@ class StripeController extends Controller
                     ],
                 ],
                 'mode' => 'payment',
-                'success_url' => route('book.payment.success', ['session_id' => '{CHECKOUT_SESSION_ID}']),
-                'cancel_url' => route('book.payment.cancel'),
+                'success_url' => route('book.stripe.success', ['session_id' => '{CHECKOUT_SESSION_ID}']),
+                'cancel_url' => route('book.stripe.cancel'),
                 'metadata' => [
                     'reservation_id' => $reservation->id,
                     'reference' => $reservation->reference,
@@ -70,7 +70,7 @@ class StripeController extends Controller
         }
     }
 
-    public function success(Request $request): RedirectResponse
+    public function success(Request $request): \Illuminate\View\View|RedirectResponse
     {
         $sessionId = $request->query('session_id');
 
@@ -93,12 +93,14 @@ class StripeController extends Controller
                     ]);
                 }
 
-                $reservation = $payment->reservation;
+                if ($payment) {
+                    $reservation = $payment->reservation;
 
-                return view('booking.payment-success', [
-                    'reservation' => $reservation,
-                    'payment' => $payment,
-                ]);
+                    return view('booking.payment-success', [
+                        'reservation' => $reservation,
+                        'payment' => $payment,
+                    ]);
+                }
             }
         } catch (\Exception $e) {
             return redirect()->route('book.index')->with('error', 'Gagal memuat status pembayaran.');

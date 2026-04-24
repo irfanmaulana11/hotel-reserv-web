@@ -26,16 +26,16 @@
 
                         <div>
                             <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="guest_name">Nama lengkap</label>
-                            <input type="text" name="guest_name" id="guest_name" value="{{ old('guest_name') }}" required class="mt-2 w-full rounded-2xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
+                            <input type="text" name="guest_name" id="guest_name" value="{{ old('guest_name', auth()->check() ? auth()->user()->name : '') }}" required class="mt-2 w-full rounded-2xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
                         </div>
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div>
                                 <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="email">Email</label>
-                                <input type="email" name="email" id="email" value="{{ old('email') }}" required class="mt-2 w-full rounded-2xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
+                                <input type="email" name="email" id="email" value="{{ old('email', auth()->check() ? auth()->user()->email : '') }}" required class="mt-2 w-full rounded-2xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="phone">Nomor telepon</label>
-                                <input type="text" name="phone" id="phone" value="{{ old('phone') }}" required class="mt-2 w-full rounded-2xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
+                                <input type="text" name="phone" id="phone" value="{{ old('phone', auth()->check() ? auth()->user()->phone : '') }}" required class="mt-2 w-full rounded-2xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
                             </div>
                         </div>
                         <div>
@@ -54,28 +54,7 @@
                         @endif
 
                         <button type="submit" class="w-full rounded-2xl bg-brand py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark">
-                            Konfirmasi pemesanan demo
-                        </button>
-                    </form>
-                </div>
-
-                {{-- Stripe Payment --}}
-                <div class="mt-6 rounded-3xl border border-stone-200 bg-white p-6 shadow-md sm:p-8">
-                    <h2 class="font-semibold text-stone-900">Pembayaran dengan Stripe</h2>
-                    <p class="mt-2 text-sm text-stone-600">Bayar dengan kartu kredit/debit melalui Stripe.</p>
-
-                    @if (session('error'))
-                        <div class="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-                            {{ session('error') }}
-                        </div>
-                    @endif
-
-                    <form action="{{ route('book.stripe.checkout') }}" method="post" class="mt-4">
-                        @csrf
-                        <input type="hidden" name="reservation_id" value="{{ session('booking.reservation_id') ?? old('reservation_id') }}">
-                        <button type="submit" class="w-full rounded-2xl bg-[#635bff] py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#5851e6]">
-                            <svg class="mx-auto h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M13.976 9.15c2.172-.806 3.356-1.427 3.356-2.982 0-1.754-1.587-2.94-4.228-2.94-2.668 0-4.389 1.246-4.965 3.154l4.523 1.683.286-1.082c.333-1.143 1.054-1.515 2.024-1.515.915 0 1.354.372 1.354 1.026 0 .806-.548 1.354-2.854 2.172-2.305.806-3.87 1.488-3.87 3.322 0 1.967 1.649 3.125 4.415 3.125 2.641 0 4.228-1.104 4.848-3.042l-4.613-1.912-.274 1.082c-.25 1.054-.888 1.488-2.024 1.488-1.026 0-1.488-.434-1.488-1.082 0-.75.488-1.323 2.71-2.097h.001ZM12 24C5.373 24 0 18.627 0 12S5.373 0 12 0s12 5.373 12 12-5.373 12-12 12Z"/></svg>
-                            Bayar dengan Stripe
+                            Lanjut Pembayaran
                         </button>
                     </form>
                 </div>

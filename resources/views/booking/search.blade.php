@@ -13,45 +13,56 @@
 
         {{-- Search form --}}
         <div class="rounded-3xl border border-stone-200 bg-[#f7f5d5] p-6 shadow-md sm:p-8">
-            <form action="{{ route('book.search') }}" method="get" class="grid gap-5 md:grid-cols-2 lg:grid-cols-5 lg:items-end">
-                <div class="md:col-span-2 lg:col-span-1">
-                    <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="s-city">Destinasi</label>
-                    <select name="city" id="s-city" class="mt-2 w-full rounded-2xl border border-stone-200 bg-white px-3 py-2.5 text-sm text-stone-900 outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
-                        <option value="">Semua kota</option>
-                        @foreach (\App\Models\Hotel::where('is_active', true)->distinct()->pluck('city')->sort() as $c)
-                            <option value="{{ $c }}" @selected($city === $c)>{{ $c }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="s-in">Check-in</label>
-                    <input type="date" name="check_in" id="s-in" value="{{ $check_in ?? now()->addDay()->toDateString() }}" class="mt-2 w-full rounded-2xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="s-out">Check-out</label>
-                    <input type="date" name="check_out" id="s-out" value="{{ $check_out ?? now()->addDays(3)->toDateString() }}" class="mt-2 w-full rounded-2xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
-                </div>
-                <div class="grid grid-cols-3 gap-2">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="s-adults">Dewasa</label>
-                        <input type="number" name="adults" id="s-adults" min="1" max="8" value="{{ $adults }}" class="mt-2 w-full rounded-2xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="s-children">Anak</label>
-                        <input type="number" name="children" id="s-children" min="0" max="6" value="{{ $children }}" class="mt-2 w-full rounded-2xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="s-rooms">Kamar</label>
-                        <input type="number" name="rooms" id="s-rooms" min="1" max="10" value="{{ $rooms }}" class="mt-2 w-full rounded-2xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
-                    </div>
-                </div>
-                <div class="md:col-span-2 lg:col-span-5">
-                    <button type="submit" class="w-full rounded-2xl bg-brand py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark md:w-auto md:px-10">
-                        Cari hotel
-                    </button>
-                </div>
-            </form>
+    {{-- Grid diubah ke lg:grid-cols-6 untuk menampung semua elemen dalam satu baris --}}
+    <form action="{{ route('book.search') }}" method="get" class="grid gap-4 md:grid-cols-2 lg:grid-cols-6 lg:items-end">
+
+        {{-- 1. Destinasi (Dropdown Fixed) --}}
+        <div class="md:col-span-2 lg:col-span-1">
+            <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="s-city">Destinasi</label>
+            <select name="city" id="s-city" class="mt-2 w-full rounded-2xl border border-stone-200 bg-transparent px-3 py-2.5 text-sm text-stone-900 outline-none focus:border-brand focus:ring-2 focus:ring-sage-100 appearance-none cursor-pointer">
+                <option value="" class="bg-white">Semua kota</option>
+                @foreach (\App\Models\Hotel::where('is_active', true)->distinct()->pluck('city')->sort() as $c)
+                    <option value="{{ $c }}" @selected($city === $c) class="bg-white">{{ $c }}</option>
+                @endforeach
+            </select>
         </div>
+
+        {{-- 2. Check-in --}}
+        <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="s-in">Check-in</label>
+            <input type="date" name="check_in" id="s-in" value="{{ $check_in ?? now()->addDay()->toDateString() }}" class="mt-2 w-full rounded-2xl border border-stone-200 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
+        </div>
+
+        {{-- 3. Check-out --}}
+        <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="s-out">Check-out</label>
+            <input type="date" name="check_out" id="s-out" value="{{ $check_out ?? now()->addDays(3)->toDateString() }}" class="mt-2 w-full rounded-2xl border border-stone-200 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
+        </div>
+
+        {{-- 4. Dewasa, Anak, Kamar (Grouped) --}}
+        <div class="md:col-span-2 lg:col-span-2 grid grid-cols-3 gap-2">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="s-adults">Dewasa</label>
+                <input type="number" name="adults" id="s-adults" min="1" max="8" value="{{ $adults }}" class="mt-2 w-full rounded-2xl border border-stone-200 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="s-children">Anak</label>
+                <input type="number" name="children" id="s-children" min="0" max="6" value="{{ $children }}" class="mt-2 w-full rounded-2xl border border-stone-200 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wide text-stone-500" for="s-rooms">Kamar</label>
+                <input type="number" name="rooms" id="s-rooms" min="1" max="10" value="{{ $rooms }}" class="mt-2 w-full rounded-2xl border border-stone-200 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-sage-100">
+            </div>
+        </div>
+
+        {{-- 5. Tombol Cari (Sekarang Inline) --}}
+        <div class="md:col-span-2 lg:col-span-1">
+            <button type="submit" class="w-full rounded-2xl bg-brand py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark">
+                Cari hotel
+            </button>
+        </div>
+    </form>
+</div>
 
         {{-- Header hasil --}}
         <div class="mt-8 flex flex-col gap-2 border-b border-stone-200 pb-6 sm:flex-row sm:items-end sm:justify-between">

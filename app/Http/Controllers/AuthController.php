@@ -52,4 +52,21 @@ class AuthController extends Controller
 
         return redirect()->route('book.index');
     }
+
+    public function profile(): \Illuminate\View\View
+    {
+        return view('booking.profile');
+    }
+
+    public function updateProfile(\Illuminate\Http\Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:32'],
+        ]);
+
+        auth()->user()->update($validated);
+
+        return redirect()->route('book.profile')->with('success', 'Profil berhasil diperbarui.');
+    }
 }

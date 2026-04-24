@@ -18,7 +18,7 @@
             <div class="max-w-xl text-white">
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sage-200/90">Destinasi</p>
                 <h1 class="mt-4 font-serif text-4xl font-semibold leading-tight sm:text-5xl">
-                    Halo, Temukan hotel yang tepat untuk setiap perjalanan Anda
+                    Temukan hotel yang tepat untuk setiap perjalanan Anda
                 </h1>
                 <p class="mt-5 text-base leading-relaxed text-stone-200">
                     Dari kota dinamis hingga sudut alam yang tenang — koleksi properti kami menghadirkan kenyamanan, perhatian pada detail, dan suasana seperti rumah.
@@ -234,6 +234,30 @@
                     </div>
                 </a>
             @endforeach
+            {{-- tambahan card untuk all destinasi --}}
+            {{-- Tambahan card untuk semua destinasi --}}
+<a href="{{ route('book.index') }}"
+   class="group relative flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-stone-200/90 bg-stone-50 shadow-md transition hover:border-brand/50 hover:bg-white hover:shadow-xl">
+
+    {{-- Background aksen (opsional) agar tidak terlalu kosong --}}
+    <div class="absolute inset-0 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+        <svg class="h-full w-full" fill="currentColor" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 100 C 20 0 50 0 100 100 Z"></path>
+        </svg>
+    </div>
+
+    <div class="relative flex flex-col items-center p-4 text-center">
+        {{-- Lingkaran Panah --}}
+        <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-stone-100 text-stone-400 shadow-sm transition-all duration-300 group-hover:bg-brand group-hover:text-white group-hover:shadow-brand/20 group-hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-6 w-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+        </div>
+
+        <p class="font-serif text-sm font-semibold text-stone-900 sm:text-base">Lihat Semua</p>
+        <p class="mt-1 text-xs text-stone-500">Destinasi</p>
+    </div>
+</a>
         </div>
     </section>
 

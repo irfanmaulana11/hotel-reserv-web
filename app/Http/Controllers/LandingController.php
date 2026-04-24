@@ -20,7 +20,7 @@ class LandingController extends Controller
                 'rooms' => Hotel::where('city', $dest->city)->where('is_active', true)->sum('total_rooms'),
                 'image' => $dest->image_url,
             ])
-            ->take(6)
+            ->take(5)
             ->all();
 
         $stayShowcase = Hotel::where('is_active', true)

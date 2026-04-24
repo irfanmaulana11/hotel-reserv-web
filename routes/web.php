@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StripeController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,3 +32,21 @@ Route::post('/stripe/webhook', [StripeController::class, 'handleWebhook'])->name
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// User profile routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [AuthController::class, 'profile'])->name('book.profile');
+    Route::post('/profile', [AuthController::class, 'updateProfile'])->name('book.profile.update');
+
+    // Cart routes
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::delete('/cart/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+    Route::get('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+    Route::post('/cart/checkout', [CartController::class, 'store'])->name('cart.store');
+
+    // Order routes
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{reservation}', [OrderController::class, 'show'])->name('orders.show');
+});

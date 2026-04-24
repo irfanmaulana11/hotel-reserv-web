@@ -291,7 +291,7 @@ class BookingController extends Controller
             'reference' => $reference,
             'hotel_id' => $hotel->id,
             'room_id' => $room->id,
-            //'user_id' => auth()->id() ?? null,
+            'user_id' => auth()->id() ?? null,
             'guest_name' => $validated['guest_name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'],
